@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { ArrowLeftIcon, EyeIcon, EyeOffIcon, MailIcon, LockIcon, UserIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const AuthPage = (): JSX.Element => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -92,20 +95,30 @@ export const AuthPage = (): JSX.Element => {
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
       if (isLogin) {
-        console.log('Login attempt:', { email: formData.email, password: formData.password });
-        // Handle successful login - redirect to dashboard
-        window.location.href = '/dashboard';
+        const { error } = await signIn(formData.email, formData.password);
+        
+        if (error) {
+          setErrors({ general: error.message || 'Login failed. Please check your credentials.' });
+        } else {
+          navigate('/dashboard');
+        }
       } else {
-        console.log('Signup attempt:', formData);
-        // Handle successful signup - redirect to verification or dashboard
-        window.location.href = '/dashboard';
+        const { error } = await signUp(formData.email, formData.password, {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          profession: formData.profession,
+        });
+        
+        if (error) {
+          setErrors({ general: error.message || 'Signup failed. Please try again.' });
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error) {
       console.error('Authentication error:', error);
+      setErrors({ general: 'An unexpected error occurred. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +149,7 @@ export const AuthPage = (): JSX.Element => {
                 variant="ghost"
                 size="icon"
                 className="hover:bg-black/10 rounded-full"
-                onClick={() => window.history.back()}
+                onClick={() => navigate('/')}
               >
                 <ArrowLeftIcon className="h-6 w-6 text-black" />
               </Button>
@@ -199,6 +212,13 @@ export const AuthPage = (): JSX.Element => {
                   }
                 </p>
               </div>
+
+              {/* General Error Message */}
+              {errors.general && (
+                <div className="mb-6 p-4 bg-red-900/50 border border-red-500 rounded-lg">
+                  <p className="text-red-400 text-sm">{errors.general}</p>
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Signup Fields */}
@@ -392,37 +412,6 @@ export const AuthPage = (): JSX.Element => {
                   )}
                 </Button>
               </form>
-
-              {/* Social Login */}
-              <div className="mt-8">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-700" />
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-gray-900 text-gray-400">Or continue with</span>
-                  </div>
-                </div>
-
-                <div className="mt-6 grid grid-cols-2 gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full h-12 bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white"
-                  >
-                    <img className="w-5 h-5 mr-2" src="/icon-1.svg" alt="Google" />
-                    Google
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full h-12 bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white"
-                  >
-                    <img className="w-5 h-5 mr-2" src="/icon-3.svg" alt="LinkedIn" />
-                    LinkedIn
-                  </Button>
-                </div>
-              </div>
 
               {/* Switch Auth Mode */}
               <div className="mt-8 text-center">

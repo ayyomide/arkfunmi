@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   BookOpenIcon, 
   PlusIcon, 
@@ -15,75 +15,84 @@ import {
   SettingsIcon,
   LogOutIcon
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
+import { useAuth } from "../../contexts/AuthContext";
+import { supabase, Article } from "../../lib/supabase";
 
 export const DashboardPage = (): JSX.Element => {
   const [activeTab, setActiveTab] = useState("feed");
   const [searchQuery, setSearchQuery] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user, userProfile, signOut } = useAuth();
+  const navigate = useNavigate();
 
-  // Mock user data
-  const user = {
-    name: "John Doe",
-    profession: "Architect",
-    avatar: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100",
+  // Mock user stats (will be replaced with real data)
+  const userStats = {
     articlesCount: 12,
     followersCount: 1250,
     followingCount: 340
   };
 
-  // Mock articles data
-  const articles = [
-    {
-      id: 1,
-      title: "Sustainable Architecture: Building for the Future",
-      excerpt: "Exploring innovative approaches to sustainable design that minimize environmental impact while maximizing functionality.",
-      author: "Sarah Chen",
-      authorAvatar: "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=100",
-      category: "Architecture",
-      readTime: "5 min read",
-      publishedAt: "2 hours ago",
-      image: "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=600",
-      likes: 124,
-      comments: 18,
-      views: 1250,
-      isLiked: false
-    },
-    {
-      id: 2,
-      title: "Modern Construction Techniques in High-Rise Buildings",
-      excerpt: "A comprehensive look at the latest construction methodologies revolutionizing skyscraper development.",
-      author: "Marcus Rodriguez",
-      authorAvatar: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100",
-      category: "Construction",
-      readTime: "8 min read",
-      publishedAt: "4 hours ago",
-      image: "https://images.pexels.com/photos/2219024/pexels-photo-2219024.jpeg?auto=compress&cs=tinysrgb&w=600",
-      likes: 89,
-      comments: 12,
-      views: 890,
-      isLiked: true
-    },
-    {
-      id: 3,
-      title: "Structural Engineering: Load Distribution in Complex Designs",
-      excerpt: "Understanding the principles of load distribution and how they apply to modern architectural challenges.",
-      author: "Dr. Amara Okafor",
-      authorAvatar: "https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=100",
-      category: "Engineering",
-      readTime: "12 min read",
-      publishedAt: "1 day ago",
-      image: "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=600",
-      likes: 156,
-      comments: 24,
-      views: 2100,
-      isLiked: false
+  useEffect(() => {
+    fetchArticles();
+  }, [activeTab]);
+
+  const fetchArticles = async () => {
+    try {
+      setLoading(true);
+      
+      let query = supabase
+        .from('articles')
+        .select(`
+          *,
+          author:users(*)
+        `)
+        .eq('status', 'published')
+        .order('created_at', { ascending: false });
+
+      if (activeTab === 'trending') {
+        query = query.order('views_count', { ascending: false });
+      } else if (activeTab === 'following') {
+        // For now, show all articles. In a real app, you'd filter by followed users
+        query = query.order('created_at', { ascending: false });
+      }
+
+      const { data, error } = await query.limit(10);
+
+      if (error) {
+        console.error('Error fetching articles:', error);
+        return;
+      }
+
+      setArticles(data || []);
+    } catch (error) {
+      console.error('Error fetching articles:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    if (diffInHours < 48) return '1 day ago';
+    return `${Math.floor(diffInHours / 24)} days ago`;
+  };
 
   const categories = ["All", "Architecture", "Engineering", "Construction", "Design", "Planning"];
 
@@ -92,6 +101,17 @@ export const DashboardPage = (): JSX.Element => {
     { id: "trending", label: "Trending", icon: <TrendingUpIcon className="w-5 h-5" /> },
     { id: "following", label: "Following", icon: <UserIcon className="w-5 h-5" /> }
   ];
+
+  if (!userProfile) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#ffb000] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-black min-h-screen">
@@ -138,14 +158,14 @@ export const DashboardPage = (): JSX.Element => {
                   className="flex items-center gap-3 cursor-pointer hover:bg-black/10 rounded-lg p-2 transition-colors"
                   onClick={() => setShowUserMenu(!showUserMenu)}
                 >
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
+                  <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                    <UserIcon className="w-5 h-5 text-white" />
+                  </div>
                   <div className="hidden sm:block">
-                    <p className="text-sm font-semibold text-black">{user.name}</p>
-                    <p className="text-xs text-gray-700">{user.profession}</p>
+                    <p className="text-sm font-semibold text-black">
+                      {userProfile.first_name} {userProfile.last_name}
+                    </p>
+                    <p className="text-xs text-gray-700">{userProfile.profession}</p>
                   </div>
                   <ChevronDownIcon className="w-4 h-4 text-black" />
                 </div>
@@ -162,7 +182,10 @@ export const DashboardPage = (): JSX.Element => {
                       Settings
                     </Link>
                     <hr className="my-2" />
-                    <button className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100">
+                    <button 
+                      onClick={handleSignOut}
+                      className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
                       <LogOutIcon className="w-4 h-4 mr-3" />
                       Sign Out
                     </button>
@@ -194,25 +217,25 @@ export const DashboardPage = (): JSX.Element => {
             <Card className="mb-6 bg-gray-900 border-gray-800">
               <CardContent className="p-6">
                 <div className="text-center">
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
-                  />
-                  <h3 className="font-bold text-lg text-white">{user.name}</h3>
-                  <p className="text-gray-400 mb-4">{user.profession}</p>
+                  <div className="w-20 h-20 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <UserIcon className="w-10 h-10 text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg text-white">
+                    {userProfile.first_name} {userProfile.last_name}
+                  </h3>
+                  <p className="text-gray-400 mb-4">{userProfile.profession}</p>
                   
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <p className="font-bold text-lg text-[#ffb000]">{user.articlesCount}</p>
+                      <p className="font-bold text-lg text-[#ffb000]">{userStats.articlesCount}</p>
                       <p className="text-xs text-gray-400">Articles</p>
                     </div>
                     <div>
-                      <p className="font-bold text-lg text-[#ffb000]">{user.followersCount}</p>
+                      <p className="font-bold text-lg text-[#ffb000]">{userStats.followersCount}</p>
                       <p className="text-xs text-gray-400">Followers</p>
                     </div>
                     <div>
-                      <p className="font-bold text-lg text-[#ffb000]">{user.followingCount}</p>
+                      <p className="font-bold text-lg text-[#ffb000]">{userStats.followingCount}</p>
                       <p className="text-xs text-gray-400">Following</p>
                     </div>
                   </div>
@@ -285,78 +308,101 @@ export const DashboardPage = (): JSX.Element => {
             </div>
 
             {/* Articles Feed */}
-            <div className="space-y-6">
-              {articles.map((article) => (
-                <Card key={article.id} className="hover:shadow-xl transition-shadow duration-300 bg-gray-900 border-gray-800">
-                  <CardContent className="p-0">
-                    <div className="flex flex-col md:flex-row">
-                      <img
-                        src={article.image}
-                        alt={article.title}
-                        className="w-full md:w-48 h-48 md:h-32 object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
-                      />
-                      
-                      <div className="flex-1 p-6">
-                        <div className="flex items-center gap-3 mb-3">
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="w-12 h-12 border-4 border-[#ffb000] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-400">Loading articles...</p>
+              </div>
+            ) : articles.length === 0 ? (
+              <div className="text-center py-12">
+                <BookOpenIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">No articles found</h3>
+                <p className="text-gray-400 mb-6">Be the first to share your knowledge with the community!</p>
+                <Button className="bg-[#ffb000] text-black hover:bg-[#e6a000]">
+                  <PlusIcon className="w-4 h-4 mr-2" />
+                  Write Your First Article
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {articles.map((article) => (
+                  <Card key={article.id} className="hover:shadow-xl transition-shadow duration-300 bg-gray-900 border-gray-800">
+                    <CardContent className="p-0">
+                      <div className="flex flex-col md:flex-row">
+                        {article.featured_image_url && (
                           <img
-                            src={article.authorAvatar}
-                            alt={article.author}
-                            className="w-8 h-8 rounded-full object-cover"
+                            src={article.featured_image_url}
+                            alt={article.title}
+                            className="w-full md:w-48 h-48 md:h-32 object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
                           />
-                          <div>
-                            <p className="font-semibold text-sm text-white">{article.author}</p>
-                            <p className="text-xs text-gray-400">{article.publishedAt}</p>
-                          </div>
-                          <Badge variant="secondary" className="ml-auto bg-[#ffb000] text-black">
-                            {article.category}
-                          </Badge>
-                        </div>
-
-                        <h3 className="font-bold text-lg text-white mb-2 hover:text-[#ffb000] cursor-pointer transition-colors">
-                          {article.title}
-                        </h3>
+                        )}
                         
-                        <p className="text-gray-400 text-sm mb-4 line-clamp-2">
-                          {article.excerpt}
-                        </p>
+                        <div className="flex-1 p-6">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                              <UserIcon className="w-4 h-4 text-white" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-sm text-white">
+                                {article.author?.first_name} {article.author?.last_name}
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                {article.created_at ? formatTimeAgo(article.created_at) : 'Recently'}
+                              </p>
+                            </div>
+                            <Badge variant="secondary" className="ml-auto bg-[#ffb000] text-black">
+                              {article.category}
+                            </Badge>
+                          </div>
 
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">{article.readTime}</span>
+                          <h3 className="font-bold text-lg text-white mb-2 hover:text-[#ffb000] cursor-pointer transition-colors">
+                            {article.title}
+                          </h3>
                           
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1 text-gray-400 hover:text-red-500 cursor-pointer transition-colors">
-                              <HeartIcon className={`w-4 h-4 ${article.isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-                              <span className="text-xs">{article.likes}</span>
-                            </div>
+                          <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+                            {article.excerpt}
+                          </p>
+
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-500">{article.read_time} min read</span>
                             
-                            <div className="flex items-center gap-1 text-gray-400 hover:text-blue-500 cursor-pointer transition-colors">
-                              <MessageCircleIcon className="w-4 h-4" />
-                              <span className="text-xs">{article.comments}</span>
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1 text-gray-400 hover:text-red-500 cursor-pointer transition-colors">
+                                <HeartIcon className="w-4 h-4" />
+                                <span className="text-xs">{article.likes_count || 0}</span>
+                              </div>
+                              
+                              <div className="flex items-center gap-1 text-gray-400 hover:text-blue-500 cursor-pointer transition-colors">
+                                <MessageCircleIcon className="w-4 h-4" />
+                                <span className="text-xs">{article.comments_count || 0}</span>
+                              </div>
+                              
+                              <div className="flex items-center gap-1 text-gray-400">
+                                <EyeIcon className="w-4 h-4" />
+                                <span className="text-xs">{article.views_count || 0}</span>
+                              </div>
+                              
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
+                                <ShareIcon className="w-4 h-4" />
+                              </Button>
                             </div>
-                            
-                            <div className="flex items-center gap-1 text-gray-400">
-                              <EyeIcon className="w-4 h-4" />
-                              <span className="text-xs">{article.views}</span>
-                            </div>
-                            
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
-                              <ShareIcon className="w-4 h-4" />
-                            </Button>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
 
             {/* Load More */}
-            <div className="text-center mt-8">
-              <Button variant="outline" className="px-8 py-3 bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white">
-                Load More Articles
-              </Button>
-            </div>
+            {articles.length > 0 && (
+              <div className="text-center mt-8">
+                <Button variant="outline" className="px-8 py-3 bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white">
+                  Load More Articles
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
