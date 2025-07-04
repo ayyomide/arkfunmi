@@ -130,9 +130,11 @@ export const LandingPage = (): JSX.Element => {
                 </div>
               ))}
 
-              <Button className="bg-black text-[#ffb000] rounded-lg px-6 py-3 h-auto hover:bg-gray-800 transition-colors">
-                <span className="font-semibold text-sm xl:text-base">Login/Signup</span>
-              </Button>
+              <Link to="/auth">
+                <Button className="bg-black text-[#ffb000] rounded-lg px-6 py-3 h-auto hover:bg-gray-800 transition-colors">
+                  <span className="font-semibold text-sm xl:text-base">Login/Signup</span>
+                </Button>
+              </Link>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -178,9 +180,11 @@ export const LandingPage = (): JSX.Element => {
                   </div>
                 ))}
                 
-                <Button className="w-full bg-black text-[#ffb000] rounded-lg py-3 mt-4">
-                  <span className="font-semibold text-base">Login/Signup</span>
-                </Button>
+                <Link to="/auth" className="block w-full">
+                  <Button className="w-full bg-black text-[#ffb000] rounded-lg py-3 mt-4">
+                    <span className="font-semibold text-base">Login/Signup</span>
+                  </Button>
+                </Link>
               </div>
             </div>
           )}
@@ -212,9 +216,11 @@ export const LandingPage = (): JSX.Element => {
                     Explore Articles
                   </Button>
 
-                  <Button className="h-12 sm:h-14 lg:h-16 xl:h-20 w-full sm:w-auto px-6 lg:px-8 xl:px-10 bg-[#ffb000] text-black rounded-lg text-base sm:text-lg lg:text-xl xl:text-2xl font-semibold hover:bg-[#e6a000] transition-colors">
-                    Join the Community
-                  </Button>
+                  <Link to="/auth">
+                    <Button className="h-12 sm:h-14 lg:h-16 xl:h-20 w-full sm:w-auto px-6 lg:px-8 xl:px-10 bg-[#ffb000] text-black rounded-lg text-base sm:text-lg lg:text-xl xl:text-2xl font-semibold hover:bg-[#e6a000] transition-colors">
+                      Join the Community
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -415,9 +421,11 @@ export const LandingPage = (): JSX.Element => {
                 Explore Articles
               </Button>
 
-              <Button className="h-12 sm:h-14 lg:h-16 xl:h-20 w-full sm:w-auto px-6 lg:px-8 xl:px-10 bg-white text-black rounded-lg text-base sm:text-lg lg:text-xl xl:text-2xl font-semibold hover:bg-gray-100 transition-colors">
-                Join the Community
-              </Button>
+              <Link to="/auth">
+                <Button className="h-12 sm:h-14 lg:h-16 xl:h-20 w-full sm:w-auto px-6 lg:px-8 xl:px-10 bg-white text-black rounded-lg text-base sm:text-lg lg:text-xl xl:text-2xl font-semibold hover:bg-gray-100 transition-colors">
+                  Join the Community
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
