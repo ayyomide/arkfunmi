@@ -98,9 +98,11 @@ export const AuthPage = (): JSX.Element => {
       if (isLogin) {
         console.log('Login attempt:', { email: formData.email, password: formData.password });
         // Handle successful login - redirect to dashboard
+        window.location.href = '/dashboard';
       } else {
         console.log('Signup attempt:', formData);
         // Handle successful signup - redirect to verification or dashboard
+        window.location.href = '/dashboard';
       }
     } catch (error) {
       console.error('Authentication error:', error);
@@ -124,7 +126,7 @@ export const AuthPage = (): JSX.Element => {
   ];
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-black min-h-screen">
       {/* Header */}
       <header className="w-full bg-[#ffb000] relative z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
@@ -155,17 +157,17 @@ export const AuthPage = (): JSX.Element => {
       </header>
 
       {/* Main Content */}
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md mx-auto">
           {/* Auth Toggle */}
           <div className="text-center mb-8">
-            <div className="inline-flex bg-white rounded-full p-1 shadow-lg">
+            <div className="inline-flex bg-gray-800 rounded-full p-1 shadow-lg">
               <button
                 onClick={() => setIsLogin(true)}
                 className={`px-6 py-3 rounded-full font-semibold transition-all ${
                   isLogin 
                     ? 'bg-[#ffb000] text-black shadow-md' 
-                    : 'text-gray-600 hover:text-black'
+                    : 'text-gray-300 hover:text-white'
                 }`}
               >
                 Login
@@ -175,7 +177,7 @@ export const AuthPage = (): JSX.Element => {
                 className={`px-6 py-3 rounded-full font-semibold transition-all ${
                   !isLogin 
                     ? 'bg-[#ffb000] text-black shadow-md' 
-                    : 'text-gray-600 hover:text-black'
+                    : 'text-gray-300 hover:text-white'
                 }`}
               >
                 Sign Up
@@ -184,13 +186,13 @@ export const AuthPage = (): JSX.Element => {
           </div>
 
           {/* Auth Form */}
-          <Card className="shadow-2xl border-none">
+          <Card className="shadow-2xl border-none bg-gray-900">
             <CardContent className="p-8">
               <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-black mb-2">
+                <h1 className="text-3xl font-bold text-white mb-2">
                   {isLogin ? "Welcome Back!" : "Join Arcfunmi"}
                 </h1>
-                <p className="text-gray-600 text-lg">
+                <p className="text-gray-300 text-lg">
                   {isLogin 
                     ? "Sign in to access your account and continue building with the best minds." 
                     : "Create your account and start sharing knowledge with professionals worldwide."
@@ -204,7 +206,7 @@ export const AuthPage = (): JSX.Element => {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="firstName" className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="firstName" className="block text-sm font-semibold text-gray-300 mb-2">
                           First Name *
                         </label>
                         <div className="relative">
@@ -215,15 +217,15 @@ export const AuthPage = (): JSX.Element => {
                             type="text"
                             value={formData.firstName}
                             onChange={handleInputChange}
-                            className={`pl-10 h-12 ${errors.firstName ? 'border-red-500' : ''}`}
+                            className={`pl-10 h-12 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-[#ffb000] focus:ring-[#ffb000] ${errors.firstName ? 'border-red-500' : ''}`}
                             placeholder="John"
                           />
                         </div>
-                        {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+                        {errors.firstName && <p className="text-red-400 text-sm mt-1">{errors.firstName}</p>}
                       </div>
                       
                       <div>
-                        <label htmlFor="lastName" className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="lastName" className="block text-sm font-semibold text-gray-300 mb-2">
                           Last Name *
                         </label>
                         <div className="relative">
@@ -234,16 +236,16 @@ export const AuthPage = (): JSX.Element => {
                             type="text"
                             value={formData.lastName}
                             onChange={handleInputChange}
-                            className={`pl-10 h-12 ${errors.lastName ? 'border-red-500' : ''}`}
+                            className={`pl-10 h-12 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-[#ffb000] focus:ring-[#ffb000] ${errors.lastName ? 'border-red-500' : ''}`}
                             placeholder="Doe"
                           />
                         </div>
-                        {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+                        {errors.lastName && <p className="text-red-400 text-sm mt-1">{errors.lastName}</p>}
                       </div>
                     </div>
 
                     <div>
-                      <label htmlFor="profession" className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label htmlFor="profession" className="block text-sm font-semibold text-gray-300 mb-2">
                         Profession *
                       </label>
                       <select
@@ -251,21 +253,21 @@ export const AuthPage = (): JSX.Element => {
                         name="profession"
                         value={formData.profession}
                         onChange={handleInputChange}
-                        className={`w-full h-12 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffb000] focus:border-transparent ${errors.profession ? 'border-red-500' : ''}`}
+                        className={`w-full h-12 px-3 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-[#ffb000] focus:border-[#ffb000] ${errors.profession ? 'border-red-500' : ''}`}
                       >
                         <option value="">Select your profession</option>
                         {professions.map((prof) => (
                           <option key={prof} value={prof}>{prof}</option>
                         ))}
                       </select>
-                      {errors.profession && <p className="text-red-500 text-sm mt-1">{errors.profession}</p>}
+                      {errors.profession && <p className="text-red-400 text-sm mt-1">{errors.profession}</p>}
                     </div>
                   </>
                 )}
 
                 {/* Email Field */}
                 <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">
                     Email Address *
                   </label>
                   <div className="relative">
@@ -276,16 +278,16 @@ export const AuthPage = (): JSX.Element => {
                       type="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`pl-10 h-12 ${errors.email ? 'border-red-500' : ''}`}
+                      className={`pl-10 h-12 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-[#ffb000] focus:ring-[#ffb000] ${errors.email ? 'border-red-500' : ''}`}
                       placeholder="your.email@example.com"
                     />
                   </div>
-                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                  {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
                 </div>
 
                 {/* Password Field */}
                 <div>
-                  <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="password" className="block text-sm font-semibold text-gray-300 mb-2">
                     Password *
                   </label>
                   <div className="relative">
@@ -296,24 +298,24 @@ export const AuthPage = (): JSX.Element => {
                       type={showPassword ? "text" : "password"}
                       value={formData.password}
                       onChange={handleInputChange}
-                      className={`pl-10 pr-10 h-12 ${errors.password ? 'border-red-500' : ''}`}
+                      className={`pl-10 pr-10 h-12 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-[#ffb000] focus:ring-[#ffb000] ${errors.password ? 'border-red-500' : ''}`}
                       placeholder="Enter your password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
                     >
                       {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                     </button>
                   </div>
-                  {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                  {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
                 </div>
 
                 {/* Confirm Password Field (Signup only) */}
                 {!isLogin && (
                   <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-300 mb-2">
                       Confirm Password *
                     </label>
                     <div className="relative">
@@ -324,18 +326,18 @@ export const AuthPage = (): JSX.Element => {
                         type={showConfirmPassword ? "text" : "password"}
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
-                        className={`pl-10 pr-10 h-12 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                        className={`pl-10 pr-10 h-12 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-[#ffb000] focus:ring-[#ffb000] ${errors.confirmPassword ? 'border-red-500' : ''}`}
                         placeholder="Confirm your password"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
                       >
                         {showConfirmPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                       </button>
                     </div>
-                    {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+                    {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
                   </div>
                 )}
 
@@ -348,9 +350,9 @@ export const AuthPage = (): JSX.Element => {
                         name="agreeToTerms"
                         checked={formData.agreeToTerms}
                         onChange={handleInputChange}
-                        className="mt-1 h-4 w-4 text-[#ffb000] border-gray-300 rounded focus:ring-[#ffb000]"
+                        className="mt-1 h-4 w-4 text-[#ffb000] bg-gray-800 border-gray-600 rounded focus:ring-[#ffb000]"
                       />
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-gray-300">
                         I agree to the{" "}
                         <a href="#" className="text-[#ffb000] hover:underline font-semibold">
                           Terms of Service
@@ -361,7 +363,7 @@ export const AuthPage = (): JSX.Element => {
                         </a>
                       </span>
                     </label>
-                    {errors.agreeToTerms && <p className="text-red-500 text-sm mt-1">{errors.agreeToTerms}</p>}
+                    {errors.agreeToTerms && <p className="text-red-400 text-sm mt-1">{errors.agreeToTerms}</p>}
                   </div>
                 )}
 
@@ -395,10 +397,10 @@ export const AuthPage = (): JSX.Element => {
               <div className="mt-8">
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300" />
+                    <div className="w-full border-t border-gray-700" />
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                    <span className="px-2 bg-gray-900 text-gray-400">Or continue with</span>
                   </div>
                 </div>
 
@@ -406,7 +408,7 @@ export const AuthPage = (): JSX.Element => {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full h-12 border-gray-300 hover:bg-gray-50"
+                    className="w-full h-12 bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white"
                   >
                     <img className="w-5 h-5 mr-2" src="/icon-1.svg" alt="Google" />
                     Google
@@ -414,7 +416,7 @@ export const AuthPage = (): JSX.Element => {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full h-12 border-gray-300 hover:bg-gray-50"
+                    className="w-full h-12 bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white"
                   >
                     <img className="w-5 h-5 mr-2" src="/icon-3.svg" alt="LinkedIn" />
                     LinkedIn
@@ -424,7 +426,7 @@ export const AuthPage = (): JSX.Element => {
 
               {/* Switch Auth Mode */}
               <div className="mt-8 text-center">
-                <p className="text-gray-600">
+                <p className="text-gray-300">
                   {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
                   <button
                     type="button"

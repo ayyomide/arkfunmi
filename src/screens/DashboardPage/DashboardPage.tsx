@@ -11,7 +11,9 @@ import {
   MessageCircleIcon,
   ShareIcon,
   FilterIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  SettingsIcon,
+  LogOutIcon
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
@@ -22,6 +24,7 @@ import { Badge } from "../../components/ui/badge";
 export const DashboardPage = (): JSX.Element => {
   const [activeTab, setActiveTab] = useState("feed");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   // Mock user data
   const user = {
@@ -91,9 +94,9 @@ export const DashboardPage = (): JSX.Element => {
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-black min-h-screen">
       {/* Header */}
-      <header className="w-full bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <header className="w-full bg-[#ffb000] shadow-lg border-b border-[#e6a000] sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -108,11 +111,11 @@ export const DashboardPage = (): JSX.Element => {
             {/* Search Bar */}
             <div className="hidden md:flex flex-1 max-w-lg mx-8">
               <div className="relative w-full">
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-600" />
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 h-10 bg-gray-100 border-none rounded-full focus:ring-2 focus:ring-[#ffb000] focus:bg-white"
+                  className="w-full pl-10 pr-4 h-10 bg-white border-none rounded-full focus:ring-2 focus:ring-black/20 text-black placeholder:text-gray-600"
                   placeholder="Search articles, authors, topics..."
                 />
               </div>
@@ -120,27 +123,51 @@ export const DashboardPage = (): JSX.Element => {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-4">
-              <Button className="bg-[#ffb000] text-black hover:bg-[#e6a000] rounded-lg px-4 py-2 h-auto font-semibold">
+              <Button className="bg-black text-[#ffb000] hover:bg-gray-800 rounded-lg px-4 py-2 h-auto font-semibold">
                 <PlusIcon className="w-4 h-4 mr-2" />
                 Write Article
               </Button>
               
-              <Button variant="ghost" size="icon" className="relative">
-                <BellIcon className="h-6 w-6 text-gray-600" />
+              <Button variant="ghost" size="icon" className="relative hover:bg-black/10">
+                <BellIcon className="h-6 w-6 text-black" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
               </Button>
 
-              <div className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 rounded-lg p-2 transition-colors">
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <div className="hidden sm:block">
-                  <p className="text-sm font-semibold text-gray-900">{user.name}</p>
-                  <p className="text-xs text-gray-500">{user.profession}</p>
+              <div className="relative">
+                <div 
+                  className="flex items-center gap-3 cursor-pointer hover:bg-black/10 rounded-lg p-2 transition-colors"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                >
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div className="hidden sm:block">
+                    <p className="text-sm font-semibold text-black">{user.name}</p>
+                    <p className="text-xs text-gray-700">{user.profession}</p>
+                  </div>
+                  <ChevronDownIcon className="w-4 h-4 text-black" />
                 </div>
-                <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+
+                {/* User Dropdown Menu */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <Link to="/profile" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                      <UserIcon className="w-4 h-4 mr-3" />
+                      Profile
+                    </Link>
+                    <Link to="/settings" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                      <SettingsIcon className="w-4 h-4 mr-3" />
+                      Settings
+                    </Link>
+                    <hr className="my-2" />
+                    <button className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100">
+                      <LogOutIcon className="w-4 h-4 mr-3" />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -148,11 +175,11 @@ export const DashboardPage = (): JSX.Element => {
           {/* Mobile Search */}
           <div className="md:hidden mt-4">
             <div className="relative">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-600" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 h-10 bg-gray-100 border-none rounded-full focus:ring-2 focus:ring-[#ffb000] focus:bg-white"
+                className="w-full pl-10 pr-4 h-10 bg-white border-none rounded-full focus:ring-2 focus:ring-black/20 text-black placeholder:text-gray-600"
                 placeholder="Search articles, authors, topics..."
               />
             </div>
@@ -164,7 +191,7 @@ export const DashboardPage = (): JSX.Element => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="mb-6">
+            <Card className="mb-6 bg-gray-900 border-gray-800">
               <CardContent className="p-6">
                 <div className="text-center">
                   <img
@@ -172,21 +199,21 @@ export const DashboardPage = (): JSX.Element => {
                     alt={user.name}
                     className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
                   />
-                  <h3 className="font-bold text-lg text-gray-900">{user.name}</h3>
-                  <p className="text-gray-600 mb-4">{user.profession}</p>
+                  <h3 className="font-bold text-lg text-white">{user.name}</h3>
+                  <p className="text-gray-400 mb-4">{user.profession}</p>
                   
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <p className="font-bold text-lg text-gray-900">{user.articlesCount}</p>
-                      <p className="text-xs text-gray-500">Articles</p>
+                      <p className="font-bold text-lg text-[#ffb000]">{user.articlesCount}</p>
+                      <p className="text-xs text-gray-400">Articles</p>
                     </div>
                     <div>
-                      <p className="font-bold text-lg text-gray-900">{user.followersCount}</p>
-                      <p className="text-xs text-gray-500">Followers</p>
+                      <p className="font-bold text-lg text-[#ffb000]">{user.followersCount}</p>
+                      <p className="text-xs text-gray-400">Followers</p>
                     </div>
                     <div>
-                      <p className="font-bold text-lg text-gray-900">{user.followingCount}</p>
-                      <p className="text-xs text-gray-500">Following</p>
+                      <p className="font-bold text-lg text-[#ffb000]">{user.followingCount}</p>
+                      <p className="text-xs text-gray-400">Following</p>
                     </div>
                   </div>
                 </div>
@@ -194,19 +221,19 @@ export const DashboardPage = (): JSX.Element => {
             </Card>
 
             {/* Quick Actions */}
-            <Card>
+            <Card className="bg-gray-900 border-gray-800">
               <CardContent className="p-6">
-                <h4 className="font-semibold text-gray-900 mb-4">Quick Actions</h4>
+                <h4 className="font-semibold text-white mb-4">Quick Actions</h4>
                 <div className="space-y-3">
-                  <Button variant="ghost" className="w-full justify-start text-left">
+                  <Button variant="ghost" className="w-full justify-start text-left text-gray-300 hover:text-white hover:bg-gray-800">
                     <PlusIcon className="w-4 h-4 mr-3" />
                     Write New Article
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-left">
+                  <Button variant="ghost" className="w-full justify-start text-left text-gray-300 hover:text-white hover:bg-gray-800">
                     <BookOpenIcon className="w-4 h-4 mr-3" />
                     My Articles
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-left">
+                  <Button variant="ghost" className="w-full justify-start text-left text-gray-300 hover:text-white hover:bg-gray-800">
                     <UserIcon className="w-4 h-4 mr-3" />
                     Edit Profile
                   </Button>
@@ -219,7 +246,7 @@ export const DashboardPage = (): JSX.Element => {
           <div className="lg:col-span-3">
             {/* Tabs */}
             <div className="flex items-center justify-between mb-6">
-              <div className="flex space-x-1 bg-white rounded-lg p-1 shadow-sm">
+              <div className="flex space-x-1 bg-gray-900 rounded-lg p-1 shadow-sm">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
@@ -227,7 +254,7 @@ export const DashboardPage = (): JSX.Element => {
                     className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-colors ${
                       activeTab === tab.id
                         ? 'bg-[#ffb000] text-black'
-                        : 'text-gray-600 hover:text-gray-900'
+                        : 'text-gray-400 hover:text-white'
                     }`}
                   >
                     {tab.icon}
@@ -236,7 +263,7 @@ export const DashboardPage = (): JSX.Element => {
                 ))}
               </div>
 
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" className="flex items-center gap-2 bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white">
                 <FilterIcon className="w-4 h-4" />
                 Filter
               </Button>
@@ -249,7 +276,7 @@ export const DashboardPage = (): JSX.Element => {
                   key={category}
                   variant={category === "All" ? "default" : "secondary"}
                   className={`cursor-pointer hover:bg-[#ffb000] hover:text-black transition-colors ${
-                    category === "All" ? 'bg-[#ffb000] text-black' : ''
+                    category === "All" ? 'bg-[#ffb000] text-black' : 'bg-gray-800 text-gray-300 hover:bg-[#ffb000] hover:text-black'
                   }`}
                 >
                   {category}
@@ -260,7 +287,7 @@ export const DashboardPage = (): JSX.Element => {
             {/* Articles Feed */}
             <div className="space-y-6">
               {articles.map((article) => (
-                <Card key={article.id} className="hover:shadow-lg transition-shadow duration-300">
+                <Card key={article.id} className="hover:shadow-xl transition-shadow duration-300 bg-gray-900 border-gray-800">
                   <CardContent className="p-0">
                     <div className="flex flex-col md:flex-row">
                       <img
@@ -277,19 +304,19 @@ export const DashboardPage = (): JSX.Element => {
                             className="w-8 h-8 rounded-full object-cover"
                           />
                           <div>
-                            <p className="font-semibold text-sm text-gray-900">{article.author}</p>
-                            <p className="text-xs text-gray-500">{article.publishedAt}</p>
+                            <p className="font-semibold text-sm text-white">{article.author}</p>
+                            <p className="text-xs text-gray-400">{article.publishedAt}</p>
                           </div>
-                          <Badge variant="secondary" className="ml-auto">
+                          <Badge variant="secondary" className="ml-auto bg-[#ffb000] text-black">
                             {article.category}
                           </Badge>
                         </div>
 
-                        <h3 className="font-bold text-lg text-gray-900 mb-2 hover:text-[#ffb000] cursor-pointer transition-colors">
+                        <h3 className="font-bold text-lg text-white mb-2 hover:text-[#ffb000] cursor-pointer transition-colors">
                           {article.title}
                         </h3>
                         
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                        <p className="text-gray-400 text-sm mb-4 line-clamp-2">
                           {article.excerpt}
                         </p>
 
@@ -297,22 +324,22 @@ export const DashboardPage = (): JSX.Element => {
                           <span className="text-xs text-gray-500">{article.readTime}</span>
                           
                           <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1 text-gray-500 hover:text-red-500 cursor-pointer transition-colors">
+                            <div className="flex items-center gap-1 text-gray-400 hover:text-red-500 cursor-pointer transition-colors">
                               <HeartIcon className={`w-4 h-4 ${article.isLiked ? 'fill-red-500 text-red-500' : ''}`} />
                               <span className="text-xs">{article.likes}</span>
                             </div>
                             
-                            <div className="flex items-center gap-1 text-gray-500 hover:text-blue-500 cursor-pointer transition-colors">
+                            <div className="flex items-center gap-1 text-gray-400 hover:text-blue-500 cursor-pointer transition-colors">
                               <MessageCircleIcon className="w-4 h-4" />
                               <span className="text-xs">{article.comments}</span>
                             </div>
                             
-                            <div className="flex items-center gap-1 text-gray-500">
+                            <div className="flex items-center gap-1 text-gray-400">
                               <EyeIcon className="w-4 h-4" />
                               <span className="text-xs">{article.views}</span>
                             </div>
                             
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
                               <ShareIcon className="w-4 h-4" />
                             </Button>
                           </div>
@@ -326,7 +353,7 @@ export const DashboardPage = (): JSX.Element => {
 
             {/* Load More */}
             <div className="text-center mt-8">
-              <Button variant="outline" className="px-8 py-3">
+              <Button variant="outline" className="px-8 py-3 bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white">
                 Load More Articles
               </Button>
             </div>
